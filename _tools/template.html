@@ -593,7 +593,7 @@ class Component extends DCLogic {
   setupHeadings() {
     const root = this.rootRef.current;
     if (!root || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const heads = [...root.querySelectorAll('h2, h3[data-reveal]')];
+    const heads = [...root.querySelectorAll('h2, h3[data-reveal]')].filter(h => !h.querySelector('[data-write]'));
     const ease = 'cubic-bezier(.2,.7,.2,1)';
     const hide = (u) => { u.style.clipPath = 'inset(0 0 100% 0)'; u.style.transform = 'translateY(0.45em)'; u.style.opacity = '0'; };
     // Split each heading into units (words, or atomic pieces like logos and highlighted words) so lines can rise one after another.
@@ -690,7 +690,7 @@ class Component extends DCLogic {
     root.querySelectorAll('[data-write]').forEach(el => {
       const i = [...el.parentElement.querySelectorAll('[data-write]')].indexOf(el);
       el.style.clipPath = 'inset(-30% 100% -30% -5%)';
-      el.style.transition = `clip-path 0.7s cubic-bezier(.5,.1,.4,1) ${0.1 + i * 0.6}s`;
+      el.style.transition = el.closest('h2') ? 'clip-path 1.3s cubic-bezier(.4,.15,.5,.95) .35s' : `clip-path 0.7s cubic-bezier(.5,.1,.4,1) ${0.1 + i * 0.6}s`;
       if (i === 0) groups.push([el.parentElement, []]);
     });
     [...root.querySelectorAll('div,span')].filter(el => {
