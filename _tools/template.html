@@ -721,11 +721,32 @@ class Component extends DCLogic {
       });
       groups.push([svg, paths]);
     });
+    let penT = 0.15;
     root.querySelectorAll('[data-write]').forEach(el => {
       const i = [...el.parentElement.querySelectorAll('[data-write]')].indexOf(el);
-      el.style.clipPath = 'inset(-30% 100% -30% -5%)';
-      el.style.transition = el.closest('h2') ? 'clip-path 1.3s cubic-bezier(.4,.15,.5,.95) .35s' : `clip-path 0.7s cubic-bezier(.5,.1,.4,1) ${0.1 + i * 0.6}s`;
-      if (i === 0) groups.push([el.parentElement, []]);
+      if (i === 0) { groups.push([el.parentElement, []]); penT = 0.15; }
+      if (el.closest('h2')) {
+        el.style.clipPath = 'inset(-30% 100% -30% -5%)';
+        el.style.transition = 'clip-path 1.3s cubic-bezier(.4,.15,.5,.95) .35s';
+        return;
+      }
+      // Handwriting: ink each letter left to right in turn, at an uneven pen speed, pausing between words and lines.
+      if (i > 0) penT += 0.3;
+      const fs = parseFloat(getComputedStyle(el).fontSize) || 100;
+      const text = el.textContent; el.textContent = '';
+      [...text].forEach(ch => {
+        if (/\s/.test(ch)) { el.appendChild(document.createTextNode(ch)); penT += 0.14; return; }
+        const s = document.createElement('span');
+        s.textContent = ch; s.dataset.ink = '1';
+        s.style.display = 'inline-block';
+        s.style.clipPath = 'inset(-30% 100% -30% 0)';
+        el.appendChild(s);
+        const w = s.getBoundingClientRect().width / fs;
+        const dur = (0.07 + w * 0.32) * (0.8 + Math.random() * 0.45);
+        s.style.transition = `clip-path ${dur.toFixed(2)}s cubic-bezier(.35,.1,.65,1) ${penT.toFixed(2)}s`;
+        s.addEventListener('transitionend', () => { s.style.clipPath = 'none'; }, { once: true });
+        penT += dur + 0.015 + Math.random() * 0.04;
+      });
     });
     [...root.querySelectorAll('div,span')].filter(el => {
       const t = (el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild.textContent : '').trim();
@@ -748,6 +769,7 @@ class Component extends DCLogic {
       (map.get(el) || []).forEach(p => { p.style.strokeDashoffset = '0px'; });
       if (el.dataset.pop) { el.style.opacity = '1'; el.style.transform = 'none'; }
       el.querySelectorAll(':scope > [data-write]').forEach(w => { w.style.clipPath = 'inset(-30% -5% -30% -5%)'; });
+      el.querySelectorAll(':scope > [data-write] > [data-ink]').forEach(s => { s.style.clipPath = 'inset(-30% -25% -30% 0)'; });
       this.drawObs && this.drawObs.unobserve(el);
     };
     this.drawObs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) reveal(e.target); }), { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
