@@ -611,7 +611,8 @@ a:hover{color:var(--ac,#1F3FD1)}
 </div>
 
 <!-- 5 · WORK WITH ME -->
-<div class="contact-cursor">
+<div class="contact-cursor" data-doodle-pad="1" style="position:relative;isolation:isolate">
+<canvas data-doodle-canvas="1" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
 <section id="contact" data-screen-label="05 Work with me" style="max-width:1280px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px) clamp(56px,8vw,96px);border-top:1px solid #141414">
   <h2 style="margin:0;font-family:'Archivo',sans-serif;font-stretch:115%;font-weight:850;font-size:clamp(64px,13vw,200px);line-height:0.84;letter-spacing:-0.05em">Work<br>with <span data-write="1" style="display:inline-block;font-family:'Caveat',cursive;font-weight:700;font-stretch:normal;font-size:1.5em;letter-spacing:0;line-height:0.6;color:var(--ac,#1F3FD1);transform:rotate(-4deg);transform-origin:left bottom">me.</span></h2>
   <p style="margin:clamp(32px,4vw,48px) 0 0;font-family:'Archivo',sans-serif;font-weight:700;font-size:clamp(24px,2.8vw,38px);line-height:1.12;letter-spacing:-0.015em;max-width:880px;text-wrap:balance">{{ closing }}</p>
@@ -649,8 +650,8 @@ class Component extends DCLogic {
     el.style.setProperty('--ac', ac);
     el.style.setProperty('--dd', (this.props.doodles ?? true) ? 'block' : 'none');
   }
-  componentDidMount() { this.applyVars(); this.setupHeadings(); setTimeout(() => this.setupDraw(), 60); }
-  componentWillUnmount() { this.drawObs && this.drawObs.disconnect(); this.headCheck && (window.removeEventListener('scroll', this.headCheck), window.removeEventListener('resize', this.headCheck)); }
+  componentDidMount() { this.applyVars(); this.setupHeadings(); setTimeout(() => this.setupDraw(), 60); this.setupDoodlePad(); }
+  componentWillUnmount() { this.doodleOff && this.doodleOff(); this.drawObs && this.drawObs.disconnect(); this.headCheck && (window.removeEventListener('scroll', this.headCheck), window.removeEventListener('resize', this.headCheck)); }
   setupHeadings() {
     const root = this.rootRef.current;
     if (!root || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -804,6 +805,84 @@ class Component extends DCLogic {
     const start = () => setTimeout(() => { groups.forEach(([svg]) => this.drawObs.observe(svg)); check(); }, 32);
     let started = false; const go = () => { if (!started) { started = true; start(); } };
     if (document.readyState === 'complete') setTimeout(go, 200); else { window.addEventListener('load', () => setTimeout(go, 300), { once: true }); setTimeout(go, 1500); }
+  }
+  // "Work with me" doodle pad: the mouse leaves a crayon line that fades after a few seconds.
+  setupDoodlePad() {
+    const root = this.rootRef.current;
+    const pad = root && root.querySelector('[data-doodle-pad]');
+    const cv = pad && pad.querySelector('[data-doodle-canvas]');
+    if (!cv || !cv.getContext) return;
+    const ctx = cv.getContext('2d');
+    const off = document.createElement('canvas'), octx = off.getContext('2d');
+    const HOLD = 1800, FADE = 1400, LIFE = HOLD + FADE;
+    let dpr = 1, grain = null, strokes = [], raf = 0, last = 0;
+    // Paper grain: random specks the wax skips over. It stays fixed to the page, like real paper tooth.
+    const makeGrain = () => {
+      const g = document.createElement('canvas'); g.width = g.height = 128;
+      const gx = g.getContext('2d'), img = gx.createImageData(128, 128);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const r = Math.random();
+        img.data[i + 3] = r < 0.26 ? 0 : 170 + r * 85;
+      }
+      gx.putImageData(img, 0, 0);
+      const pat = octx.createPattern(g, 'repeat');
+      // scale the specks up into soft clumps, closer to wax on paper than to pixel noise
+      if (pat.setTransform && window.DOMMatrix) pat.setTransform(new DOMMatrix().scale(1.6 * dpr));
+      return pat;
+    };
+    const size = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = pad.getBoundingClientRect();
+      cv.width = off.width = Math.round(r.width * dpr);
+      cv.height = off.height = Math.round(r.height * dpr);
+      grain = makeGrain();
+    };
+    const color = () => getComputedStyle(root).getPropertyValue('--ac').trim() || '#1F3FD1';
+    const render = () => {
+      const now = performance.now();
+      strokes = strokes.map(s => s.filter(p => now - p.t < LIFE)).filter(s => s.length);
+      octx.setTransform(1, 0, 0, 1, 0, 0);
+      octx.globalCompositeOperation = 'source-over';
+      octx.clearRect(0, 0, off.width, off.height);
+      octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      octx.strokeStyle = color(); octx.lineCap = octx.lineJoin = 'round';
+      strokes.forEach(s => {
+        for (let i = 1; i < s.length; i++) {
+          const a = s[i - 1], b = s[i], age = now - b.t;
+          octx.globalAlpha = age < HOLD ? 1 : Math.max(0, 1 - (age - HOLD) / FADE);
+          octx.lineWidth = b.w;
+          octx.beginPath(); octx.moveTo(a.x, a.y); octx.lineTo(b.x, b.y); octx.stroke();
+          // a thinner second pass, slightly offset, gives the waxy uneven edge
+          const j = b.w * 0.28;
+          octx.lineWidth = b.w * 0.5;
+          octx.beginPath(); octx.moveTo(a.x + j, a.y - j * 0.6); octx.lineTo(b.x + j, b.y - j * 0.6); octx.stroke();
+        }
+      });
+      octx.globalAlpha = 1;
+      octx.setTransform(1, 0, 0, 1, 0, 0);
+      octx.globalCompositeOperation = 'destination-in';
+      octx.fillStyle = grain; octx.fillRect(0, 0, off.width, off.height);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.drawImage(off, 0, 0);
+      raf = strokes.length ? requestAnimationFrame(render) : 0;
+    };
+    const move = (e) => {
+      if (e.pointerType === 'touch') return; // keep phones scrolling normally
+      if (e.pointerType === 'pen' && !e.pressure) return;
+      const r = pad.getBoundingClientRect(), now = performance.now();
+      const p = { x: e.clientX - r.left, y: e.clientY - r.top, t: now, w: 8 + Math.random() * 3 };
+      let s = strokes[strokes.length - 1];
+      const q = s && s[s.length - 1];
+      if (!q || now - last > 120 || Math.hypot(p.x - q.x, p.y - q.y) > 80) strokes.push(s = []);
+      else if (Math.hypot(p.x - q.x, p.y - q.y) < 2) return;
+      s.push(p); last = now;
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+    size();
+    const ro = window.ResizeObserver ? new ResizeObserver(size) : null;
+    ro ? ro.observe(pad) : window.addEventListener('resize', size);
+    pad.addEventListener('pointermove', move, { passive: true });
+    this.doodleOff = () => { pad.removeEventListener('pointermove', move); ro ? ro.disconnect() : window.removeEventListener('resize', size); cancelAnimationFrame(raf); };
   }
   componentDidUpdate() { this.applyVars(); }
   renderVals() {
