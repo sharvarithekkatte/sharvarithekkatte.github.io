@@ -482,6 +482,28 @@ a:hover{color:var(--ac,#1F3FD1)}
           <span style="font-size:12px;font-weight:500;padding:5px 10px;border:1px solid #141414;border-radius:999px;white-space:nowrap">Data Tracking</span>
         </div>
       </div>
+    <style>
+      .cp-collage{position:relative;width:100%;aspect-ratio:2.4/1;margin-top:clamp(40px,5vw,64px)}
+      .cp-shot{position:absolute;display:block;height:auto;object-fit:cover;border-radius:6px;box-shadow:0 6px 18px rgba(20,20,20,0.18);transform:rotate(var(--r));transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;cursor:zoom-in;outline:none}
+      .cp-shot:hover,.cp-shot:focus-visible,.cp-shot:active{transform:rotate(0deg) scale(1.22);z-index:20;box-shadow:0 22px 48px rgba(20,20,20,0.35)}
+      .cp-1{left:0;top:10%;width:18%;z-index:2} .cp-2{left:14%;top:32%;width:17%;z-index:3} .cp-3{left:28%;top:4%;width:30%;z-index:1}
+      .cp-4{left:52%;top:28%;width:17%;z-index:4} .cp-5{left:66%;top:2%;width:18%;z-index:2} .cp-6{left:81%;top:30%;width:17%;z-index:3}
+      @media (max-width:700px){
+        .cp-collage{aspect-ratio:1/1.55}
+        .cp-shot:hover,.cp-shot:focus-visible,.cp-shot:active{transform:rotate(0deg) scale(1.1)}
+        .cp-1{left:0;top:0;width:44%} .cp-2{left:40%;top:3%;width:42%} .cp-3{left:10%;top:32%;width:64%}
+        .cp-4{left:56%;top:36%;width:44%} .cp-5{left:0;top:58%;width:42%} .cp-6{left:46%;top:64%;width:36%}
+      }
+      @media (prefers-reduced-motion: reduce){.cp-shot{transition:none}}
+    </style>
+    <div class="cp-collage">
+      <img class="cp-shot cp-1" tabindex="0" src="397a84ee-86d2-4fbb-abe8-50df71be0e52" alt="Sharvari holding an iPad with a Copilot sign-up QR code at a campus tabling activation" draggable="false" style="aspect-ratio:3/4;--r:-4deg">
+      <img class="cp-shot cp-2" tabindex="0" src="22b3d9df-c81e-4080-8108-d18413cf12d3" alt="Group photo of students holding Copilot swag behind a Microsoft Copilot table" draggable="false" style="aspect-ratio:2/3;--r:3deg">
+      <img class="cp-shot cp-3" tabindex="0" src="4d7686ae-e379-4876-ac5d-16202091f19f" alt="Sharvari presenting 'Free Copilot Tools for Your Career' to a full classroom" draggable="false" style="aspect-ratio:4/3;--r:-2deg">
+      <img class="cp-shot cp-4" tabindex="0" src="190c4ae6-ab9e-411e-96c2-0db76a5b42d4" alt="Sharvari and a teammate holding Copilot tote bags at the event table" draggable="false" style="aspect-ratio:2/3;--r:4deg">
+      <img class="cp-shot cp-5" tabindex="0" src="9483b532-cb2f-49ed-93d6-ec2047062db9" alt="Sharvari pointing to a slide on how to differentiate Copilots" draggable="false" style="aspect-ratio:3/4;--r:-3deg">
+      <img class="cp-shot cp-6" tabindex="0" src="ac31f9d8-4d3b-4409-863f-2cbc6dc54628" alt="Students networking at a Copilot event with a 'Download Copilot Now' screen behind them" draggable="false" style="aspect-ratio:2/3;--r:2deg">
+    </div>
   </div>
 
   <!-- SOCIAL MEDIA -->
