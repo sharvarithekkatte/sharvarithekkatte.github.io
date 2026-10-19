@@ -468,9 +468,11 @@ a:hover{color:var(--ac,#1F3FD1)}
           <li>Organizing <strong>3 presentations</strong> showcasing Copilot in career development (UBIC × Abbott), startup innovation (Delta Theta Chi), and product development (CSES Hackathon Copilot Track).</li>
         </ul>
       </div>
-      <div class="cp-collage">
+      <div class="cp-wrap"><div class="cp-collage">
         <style>
-          .cp-collage{position:relative;width:100%;max-width:400px;aspect-ratio:1/1;align-self:center;justify-self:end}
+          .cp-wrap{position:relative;width:100%;min-height:300px}
+          .cp-collage{position:absolute;top:0;bottom:0;right:0;aspect-ratio:1/1;max-width:100%}
+          @media (max-width:760px){.cp-wrap{min-height:0;aspect-ratio:1/1;max-width:420px;margin:0 auto}}
           .cp-shot{position:absolute;display:block;height:auto;border-radius:6px;box-shadow:0 6px 18px rgba(20,20,20,0.18);transform:rotate(var(--r));transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;cursor:zoom-in;outline:none}
           .cp-shot:hover,.cp-shot:focus-visible,.cp-shot:active{transform:rotate(0deg) scale(1.9);z-index:20!important;box-shadow:0 22px 48px rgba(20,20,20,0.35)}
           @media (max-width:700px){.cp-shot:hover,.cp-shot:focus-visible,.cp-shot:active{transform:rotate(0deg) scale(1.5)}}
@@ -483,7 +485,7 @@ a:hover{color:var(--ac,#1F3FD1)}
         <img class="cp-shot" tabindex="0" src="190c4ae6-ab9e-411e-96c2-0db76a5b42d4" alt="Sharvari and a teammate holding Copilot tote bags at the event table" draggable="false" style="--r:-3deg;left:66%;top:40%;width:30%;z-index:5">
         <img class="cp-shot" tabindex="0" src="9483b532-cb2f-49ed-93d6-ec2047062db9" alt="Sharvari pointing to a slide on how to differentiate Copilots" draggable="false" style="--r:3deg;left:2%;top:52%;width:34%;z-index:6">
         <img class="cp-shot" tabindex="0" src="ac31f9d8-4d3b-4409-863f-2cbc6dc54628" alt="Students networking at a Copilot event with a 'Download Copilot Now' screen behind them" draggable="false" style="--r:-2deg;left:40%;top:56%;width:28%;z-index:7">
-      </div>
+      </div></div>
     </div>
       <div style="margin-top:28px">
         <h4 style="margin:0 0 10px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;color:#5A564D">Skills</h4>
