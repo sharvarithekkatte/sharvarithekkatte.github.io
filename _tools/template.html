@@ -730,7 +730,7 @@ class Component extends DCLogic {
     const root = this.rootRef.current;
     if (!root || !window.matchMedia || !window.IntersectionObserver) return;
     if (!matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
-    const svgs = [...root.querySelectorAll('svg')].filter(s => (!s.closest('a,button') || s.closest('[aria-hidden="true"]')) && !s.querySelector('.hw-stroke'));
+    const svgs = [...root.querySelectorAll('svg')].filter(s => (!s.closest('a,button') || s.closest('[aria-hidden="true"]')) && !s.querySelector('.hw-stroke') && !s.classList.contains('ev-fig'));
     const groups = [];
     svgs.forEach(svg => {
       const paths = [...svg.querySelectorAll('path,line,polyline,circle,ellipse,rect')].filter(p => {
@@ -760,6 +760,8 @@ class Component extends DCLogic {
           p.style.strokeDasharray = len + 'px ' + len + 'px'; p.style.strokeDashoffset = len + 'px';
         }
         const px = L * scale;
+        // "Everyone" trails: draw out from each person together, lightly staggered
+        if (svg.classList.contains('ev-arcs')) { p.style.transition = `stroke-dashoffset 1.6s cubic-bezier(.45,.05,.55,.95) ${(0.2 + paths.indexOf(p) * 0.14).toFixed(2)}s`; return; }
         const dur = Math.min(1.5, Math.max(paths.length === 1 ? 1.4 : 0.5, px / 450));
         p.style.transition = `stroke-dashoffset ${dur.toFixed(2)}s cubic-bezier(.45,.05,.55,.95) ${t.toFixed(2)}s`;
         t += dur + 0.06;
