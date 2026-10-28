@@ -682,21 +682,24 @@ class Component extends DCLogic {
     if (!reel) return;
     const track = reel.querySelector('[data-reel-track]'), cards = [...reel.querySelectorAll('[data-reel-card]')];
     const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const base = still ? 0 : 0.6;
-    let off = 0, vel = base, target = base, tx = 0, ty = 0, ttx = 0, tty = 0, hover = null, last = 0, raf = 0, seen = false;
-    cards.forEach(c => { c._h = 0; c.addEventListener('pointerenter', () => { hover = c; }); c.addEventListener('pointerleave', () => { if (hover === c) hover = null; }); });
+    const base = still ? 0 : 0.8;
+    let off = 0, vel = base, target = base, tx = 0, ty = 0, ttx = 0, tty = 0, px = 0, py = 0, inside = false, last = 0, raf = 0, seen = false;
+    cards.forEach(c => { c._h = 0; });
     const move = e => {
       if (e.pointerType === 'touch') return;
+      px = e.clientX; py = e.clientY; inside = true;
       const r = reel.getBoundingClientRect(), nx = (e.clientX - r.left) / r.width * 2 - 1, ny = (e.clientY - r.top) / r.height * 2 - 1;
-      target = still ? 0 : base + nx * 4; ttx = ny; tty = nx;
+      ttx = ny; tty = nx;
     };
-    const leave = () => { target = base; ttx = tty = 0; hover = null; };
+    const leave = () => { ttx = tty = 0; inside = false; };
     reel.addEventListener('pointermove', move); reel.addEventListener('pointerleave', leave);
     const frame = t => {
       const dt = last ? Math.min(3, (t - last) / 16.67) : 1; last = t;
       vel += (target - vel) * 0.05 * dt; tx += (ttx - tx) * 0.08 * dt; ty += (tty - ty) * 0.08 * dt;
       const W = reel.clientWidth, cw = cards[0].offsetWidth, step = cw * 1.12, total = step * cards.length;
       off = ((off + vel * dt) % total + total) % total;
+      const hover = inside ? cards.find(c => { if (c.style.visibility) return false; const b = c.getBoundingClientRect(); return px >= b.left && px <= b.right && py >= b.top && py <= b.bottom; }) : null;
+      target = hover ? base * 0.3 : base;
       track.style.transform = `rotateX(${-tx * 5}deg) rotateY(${ty * 6}deg)`;
       cards.forEach((c, i) => {
         const x = ((i * step - off) % total + total * 1.5) % total - total / 2;
