@@ -893,7 +893,10 @@ class Component extends DCLogic {
       octx.globalCompositeOperation = 'destination-in';
       octx.fillStyle = grain; octx.fillRect(0, 0, off.width, off.height);
       ctx.clearRect(0, 0, cv.width, cv.height);
+      // keep the cursor crayon faint: a light wash of the accent, not a bold mark
+      ctx.globalAlpha = 0.28;
       ctx.drawImage(off, 0, 0);
+      ctx.globalAlpha = 1;
       raf = strokes.length ? requestAnimationFrame(render) : 0;
     };
     const move = (e) => {
