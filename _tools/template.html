@@ -598,7 +598,7 @@ a:hover{color:var(--ac,#1F3FD1)}
         <li><strong style="font-weight:700">Marketing Operations:</strong> Standardized workflows by implementing marketing trackers and spreadsheets to streamline campaign planning, content management, and team coordination.</li>
       </ul>
     </div>
-    <div data-reel="1" sc-camel-on-context-menu="{{ noSave }}" sc-camel-on-drag-start="{{ noSave }}" style="--cw:clamp(112px,12.5vw,210px);position:relative;margin-top:clamp(8px,2vw,24px);width:100vw;left:50%;margin-left:-50vw;height:calc(var(--cw) * 2.4);background:radial-gradient(ellipse 52% 50% at 50% 50%,rgba(10,22,60,0.95) 0%,rgba(12,27,80,0.9) 45%,rgba(20,42,140,0.55) 70%,rgba(31,63,209,0.15) 88%,rgba(31,63,209,0) 100%);perspective:900px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)">
+    <div data-reel="1" sc-camel-on-context-menu="{{ noSave }}" sc-camel-on-drag-start="{{ noSave }}" style="--cw:clamp(112px,12.5vw,210px);position:relative;margin-top:clamp(8px,2vw,24px);width:100vw;left:50%;margin-left:-50vw;height:calc(var(--cw) * 2.4);background:radial-gradient(ellipse 38% 48% at 50% 50%,rgba(10,22,60,0.95) 0%,rgba(12,27,80,0.82) 40%,rgba(22,45,150,0.38) 70%,rgba(31,63,209,0) 100%);perspective:900px;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)">
       <div data-reel-track="1" style="position:absolute;inset:0;transform-style:preserve-3d">
         <img data-reel-card="1" src="275af7fd-cf7b-4859-b772-1bb9be64d8c1" alt="Instagram post for iHouse UCSD" draggable="false" style="position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:clamp(10px,1.4vw,18px);box-shadow:0 8px 20px rgba(20,20,20,0.16);backface-visibility:hidden;will-change:transform;transform:translate(-50%,-50%)">
         <img data-reel-card="1" src="df20a69c-f02f-4348-aea1-2fa5f5c06d47" alt="Roblox x CSES event flyer" draggable="false" style="position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:clamp(10px,1.4vw,18px);box-shadow:0 8px 20px rgba(20,20,20,0.16);backface-visibility:hidden;will-change:transform;transform:translate(-50%,-50%)">
@@ -707,6 +707,9 @@ class Component extends DCLogic {
         c._h += ((c === hover ? 1 : 0) - c._h) * 0.15 * dt;
         c.style.transform = `translate(-50%,-50%) translateX(${x}px) translateZ(${u * u * 150 + c._h * 60}px) rotateY(${-u * 30}deg) translateY(${-c._h * 8}px)`;
         c.style.visibility = Math.abs(x) > W * 0.95 ? 'hidden' : '';
+        // Depth shading: far (center) cards sit dimmer in the glow, near (edge) cards come forward brighter with a deeper shadow
+        const k = Math.min(1, u * u) * 0.75 + c._h * 0.25, f = `brightness(${(0.72 + 0.28 * k).toFixed(2)})`;
+        if (c._f !== f) { c._f = f; c.style.filter = f; c.style.boxShadow = `0 ${(6 + 14 * k).toFixed(0)}px ${(14 + 26 * k).toFixed(0)}px rgba(10,22,60,${(0.18 + 0.2 * k).toFixed(2)})`; }
       });
       raf = seen ? requestAnimationFrame(frame) : 0;
     };
