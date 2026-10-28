@@ -741,7 +741,7 @@ class Component extends DCLogic {
       window.addEventListener('scroll', upd, { passive: true });
       window.addEventListener('resize', upd);
     }
-    const svgs = [...root.querySelectorAll('svg')].filter(s => (!s.closest('a,button') || s.closest('[aria-hidden="true"]')) && !s.querySelector('.hw-stroke') && !s.classList.contains('ev-fig') && !s.classList.contains('ev-arcs'));
+    const svgs = [...root.querySelectorAll('svg')].filter(s => (!s.closest('a,button') || s.closest('[aria-hidden="true"]')) && !s.querySelector('.hw-stroke') && !s.classList.contains('ev-fig') && !s.classList.contains('ev-arcs') && !s.classList.contains('m3-abr'));
     const groups = [];
     svgs.forEach(svg => {
       const paths = [...svg.querySelectorAll('path,line,polyline,circle,ellipse,rect')].filter(p => {
